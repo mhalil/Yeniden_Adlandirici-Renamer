@@ -9,7 +9,9 @@ import sys
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.constants import *
-from tkinter.filedialog import askopenfilename
+import os
+from tkinter.filedialog import askopenfilename, askopenfilenames
+from tkinter import messagebox
 
 
 import Renamer
@@ -25,33 +27,118 @@ def main(*args):
     _w1 = Renamer.Toplevel1(_top1)
     root.mainloop()
 
+def isim_donustur(eski_tam_yol, sira=0):
+    dizin, eski_isim = os.path.split(eski_tam_yol)
+    isim, uzanti = os.path.splitext(eski_isim)
+    yeni_isim = isim
+
+    # 1. Değiştir / Yerine Koy
+    # NOT: Renamer.py dosyasında kutu isimleri etiketlerle ters isimlendirildiği için get() yerleri değiştirildi.
+    if _w1.Degistir.get() == 1:
+        eski_deger = _w1.YerineKoyulacakYazi.get()  # UI'da "Değiştirilecek Değer" etiketi yanında
+        yeni_deger = _w1.DegistirilecekYazi.get()  # UI'da "Yerine Koyulacak Değer" etiketi yanında
+        if eski_deger:
+            yeni_isim = yeni_isim.replace(eski_deger, yeni_deger)
+
+    # 2. Karakter / Kelime Sil
+    if _w1.KarakterSil.get() == 1:
+        silinecek = _w1.SilYaz.get()
+        if silinecek:
+            yeni_isim = yeni_isim.replace(silinecek, "")
+
+    # 3. Harf Durumu (Radio)
+    r_val = _w1.Radio.get()
+    if r_val == 1: # küçük harf
+        yeni_isim = yeni_isim.lower()
+    elif r_val == 2: # BÜYÜK HARF
+        yeni_isim = yeni_isim.upper()
+    elif r_val == 3: # Kelimelerin Baş Harfleri Büyük
+        yeni_isim = yeni_isim.title()
+    elif r_val == 4: # hARFLERİ tERS çEVİR
+        yeni_isim = yeni_isim.swapcase()
+    elif r_val == 5: # İsmi ters çevir
+        yeni_isim = yeni_isim[::-1]
+
+    # 4. Ön Ek
+    if _w1.OnEk.get() == 1:
+        yeni_isim = _w1.OnEkYaz.get() + yeni_isim
+
+    # 5. Son Ek
+    if _w1.SonEk.get() == 1:
+        yeni_isim = yeni_isim + _w1.SonEkYaz.get()
+
+    # 6. Sıralı Artır
+    if _w1.SiraliArtir.get() == 1:
+        try:
+            baslangic = int(_w1.BaslDegerYaz.get())
+        except ValueError:
+            baslangic = 1
+        yeni_isim = f"{yeni_isim}_{baslangic + sira}"
+
+    return yeni_isim + uzanti
+
 def Buton_onizle(*args):
-    print('Renamer1_2_support.Buton_onizle')
-    for arg in args:
-        print ('another arg:', arg)
+    print('Renamer_support.Buton_onizle')
+    _w1.onizle_text.configure(state='normal')
+    _w1.onizle_text.delete('1.0', 'end')
+    
+    dosyalar = _w1.SecilenDosyalar.get(0, 'end')
+    for i, dosya in enumerate(dosyalar):
+        yeni_ad = isim_donustur(dosya, i)
+        _w1.onizle_text.insert('end', yeni_ad + "\n")
+    
+    _w1.onizle_text.configure(state='disabled')
     sys.stdout.flush()
 
 def Uygula(*args):
-    print('Renamer1_2_support.Uygula')
-    for arg in args:
-        print ('another arg:', arg)
+    print('Renamer_support.Uygula')
+    dosyalar = _w1.SecilenDosyalar.get(0, 'end')
+    if not dosyalar:
+        messagebox.showwarning("Uyarı", "Lütfen önce dosya ekleyin.")
+        return
+
+    onay = messagebox.askyesno("Onay", f"{len(dosyalar)} dosya yeniden adlandırılacak. Emin misiniz?")
+    if not onay:
+        return
+
+    basarili_sayisi = 0
+    hata_sayisi = 0
+
+    for i, dosya_yolu in enumerate(dosyalar):
+        dizin, eski_isim = os.path.split(dosya_yolu)
+        yeni_isim = isim_donustur(dosya_yolu, i)
+        yeni_yol = os.path.join(dizin, yeni_isim)
+
+        try:
+            os.rename(dosya_yolu, yeni_yol)
+            basarili_sayisi += 1
+        except Exception as e:
+            print(f"Hata: {dosya_yolu} -> {yeni_yol} : {e}")
+            hata_sayisi += 1
+
+    # İşlem bittikten sonra listeyi temizle veya güncelle
+    _w1.SecilenDosyalar.delete(0, 'end')
+    _w1.onizle_text.configure(state='normal')
+    _w1.onizle_text.delete('1.0', 'end')
+    _w1.onizle_text.configure(state='disabled')
+
+    messagebox.showinfo("Bitti", f"İşlem tamamlandı.\nBaşarılı: {basarili_sayisi}\nHata: {hata_sayisi}")
     sys.stdout.flush()
 
 def cikar(*args):
-    print('Renamer1_2_support.cikar')
-    for arg in args:
-        print ('another arg:', arg)
+    print('Renamer_support.cikar')
+    secili_indexler = _w1.SecilenDosyalar.curselection()
+    for index in reversed(secili_indexler):
+        _w1.SecilenDosyalar.delete(index)
     sys.stdout.flush()
 
 def ekle(*args):
     print("Ekle Fonksiyonu çalıştı")
-    secim = askopenfilename()
-    print(secim)
-    # Buraya, listeden ListBox'a ekleme fonksiyonu eklenecek
-    # return secim
-    # for dosya in secim:
-    #     _w1.Etiket_dosya_sec.S
-        # _w1.Etiket_dosya_sec.SecilenDosyalar.insert('end', dosya)
+    secimler = askopenfilenames()
+    if secimler:
+        for dosya in secimler:
+            _w1.SecilenDosyalar.insert('end', dosya)
+    print(secimler)
 
 def OnEkEkle():
     print("OnEkEkle komutu çalıştı")
