@@ -18,19 +18,19 @@ Belirlediğiniz kriterlere göre oluşacak dosya adlarını, Önizleme ekranınd
 
 * Dosya adını küçük harflere çevir
 
-* Dosya adındaki her kelimenin baş harfini büyük harfe çevir
+* Dosya adındaki Her Kelimenin Baş Harfini Büyük Harfe çevir
 
-* Dosya Adındaki büyük/küçük harfleri ters çevir (Ör. Halil.docx > hALİL.docx )
+* Dosya Adındaki BÜYÜK/küçük harfleri ters çevir (Ör. Halil.docx > hALİL.docx )
 
 * Dosya adındaki harf sıralamasını ters çevir (Ör.  123.pdf > 321.pdf) 
 
-* Dosya adına ön ek ekleme
+* Dosya adına Ön Ek ekleme
 
-* Dosya adına son ek ekleme
+* Dosya adına Son Ek ekleme
 
-* Dosya Sıralamasını Değiştirme (Yukarı/Aşağı/Ters)
+* Dosyayı adlandırmadan önce Sıralamayı Değiştir (Yukarı / Aşağı Taşı, Sıralamayı Ters Çevir)
 
-* Dosya Eklemede Sürükle-Bırak Desteği
+* Dosya Eklerken Sürükle-Bırak Desteği
 
 * Eklenen Dosyaları **CTRL** ile tek tek ya da **SHIFT** ile bir aralıkta Seçme
 
