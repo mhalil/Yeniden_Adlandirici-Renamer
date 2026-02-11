@@ -2,13 +2,17 @@
 
 Dosya isimlerini, belirlediğiniz parametrelere göre yeniden adlandıran uygulama.
 
-Yaptığınız değişiklikleri, Önizleme ekranında eşzamanlı olarak görebilirsiniz.
+Belirlediğiniz kriterlere göre oluşacak dosya adlarını, Önizleme ekranında anlık olarak görebilirsiniz.
 
 ## Yeniden Adlandırma Yapılırken Kullanılabilecek Özellikler
 
-* Dosya adında adındaki karakter(ler)i başka karakter(ler) ile değiştir
+* Sıfırdan Adlandırma
 
-* Dosya adındaki belirlenen karakter / kelime (Ör. "boşluk") sil
+* Sıralı Numaralandırma, Başlangıç sayısını belirle, birer birer artır.
+
+* Dosya adındaki karakter(ler)i başka karakter(ler) ile değiştir (Bul ve Değiştir)
+
+* Dosya adındaki belirlenen karakter / kelime sil. (Ör. "boşluk")
 
 * Dosya adını BÜYÜK HARFE çevir
 
@@ -18,13 +22,19 @@ Yaptığınız değişiklikleri, Önizleme ekranında eşzamanlı olarak görebi
 
 * Dosya Adındaki büyük/küçük harfleri ters çevir (Ör. Halil.docx > hALİL.docx )
 
-* Dosya adındaki harf sıralamasını ters çevir (Ör.  Mustafa.pdf > afatsuM.pdf) 
+* Dosya adındaki harf sıralamasını ters çevir (Ör.  123.pdf > 321.pdf) 
 
 * Dosya adına ön ek ekleme
 
 * Dosya adına son ek ekleme
 
-* Dosya adına sıralı sayı ekle; Başlangıç sayısını belirle
+* Dosya Sıralamasını Değiştirme (Yukarı/Aşağı/Ters)
+
+* Dosya Eklemede Sürükle-Bırak Desteği
+
+* Eklenen Dosyaları **CTRL** ile tek tek ya da **SHIFT** ile bir aralıkta Seçme
+
+* Anlık Dinamik Önizleme
 
 ## Geliştirici Bilgileri:
 
@@ -46,4 +56,3 @@ Yaptığınız değişiklikleri, Önizleme ekranında eşzamanlı olarak görebi
 ![yeniden_adlandir_2](img/yeniden_adlandir_2.png)
 ![yeniden_adlandir_3](img/yeniden_adlandir_3.png)
 ![yeniden_adlandir_4](img/yeniden_adlandir_4.png)
-![yeniden_adlandir_5](img/yeniden_adlandir_5.png)

@@ -1,5 +1,6 @@
 import sys
 import os
+import re
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                              QPushButton, QListWidget, QTextEdit, QCheckBox, QLineEdit, 
                              QLabel, QGroupBox, QRadioButton, QFileDialog, QMessageBox, 
@@ -9,7 +10,7 @@ from PyQt6.QtCore import Qt, pyqtSignal
 class ModernRenamer(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(".: Yeniden Adlandır - Renamer v2.0 :.")
+        self.setWindowTitle(".: Yeniden Adlandırıcı [Renamer] :.")
         self.setMinimumSize(1000, 750)
         
         # Stylesheet (Modern Light Theme)
@@ -20,13 +21,13 @@ class ModernRenamer(QMainWindow):
             QWidget {
                 color: #212121;
                 font-family: 'Segoe UI', 'Roboto', sans-serif;
-                font-size: 13px;
+                font-size: 12px;
             }
             QGroupBox {
                 border: 1px solid #d0d0d0;
-                border-radius: 10px;
-                margin-top: 30px;
-                padding-top: 25px;
+                border-radius: 8px;
+                margin-top: 15px;
+                padding-top: 15px;
                 font-weight: bold;
                 background-color: #ffffff;
             }
@@ -41,7 +42,7 @@ class ModernRenamer(QMainWindow):
                 background-color: #e0e0e0;
                 border: 1px solid #cccccc;
                 border-radius: 4px;
-                padding: 8px 15px;
+                padding: 6px 12px;
                 color: #212121;
             }
             QPushButton:hover {
@@ -86,13 +87,13 @@ class ModernRenamer(QMainWindow):
             }
             QCheckBox, QRadioButton {
                 color: #212121;
-                padding: 4px 10px;
-                min-height: 30px;
-                spacing: 15px;
+                padding: 2px 8px;
+                min-height: 24px;
+                spacing: 10px;
             }
             QCheckBox::indicator, QRadioButton::indicator {
-                width: 24px;
-                height: 24px;
+                width: 18px;
+                height: 18px;
                 border: 2px solid #9e9e9e;
                 background-color: #ffffff;
             }
@@ -102,7 +103,7 @@ class ModernRenamer(QMainWindow):
             }
             QRadioButton::indicator:checked {
                 background-color: #1976D2;
-                border: 8px solid #ffffff;
+                border: 5px solid #ffffff;
             }
             QCheckBox:hover, QRadioButton:hover {
                 background-color: #f0f0f0;
@@ -150,7 +151,22 @@ class ModernRenamer(QMainWindow):
         self.btn_remove = QPushButton("Seçiliyi Çıkar")
         self.btn_remove.setObjectName("dangerBtn")
         self.btn_remove.setCursor(Qt.CursorShape.PointingHandCursor)
+        
+        self.btn_up = QPushButton("↑ Yukarı")
+        self.btn_up.setFixedWidth(80)
+        self.btn_up.setCursor(Qt.CursorShape.PointingHandCursor)
+        
+        self.btn_down = QPushButton("↓ Aşağı")
+        self.btn_down.setFixedWidth(80)
+        self.btn_down.setCursor(Qt.CursorShape.PointingHandCursor)
+        
+        self.btn_reverse = QPushButton("⇆ Ters Çevir")
+        self.btn_reverse.setCursor(Qt.CursorShape.PointingHandCursor)
+        
         btn_layout.addWidget(self.btn_add)
+        btn_layout.addWidget(self.btn_up)
+        btn_layout.addWidget(self.btn_down)
+        btn_layout.addWidget(self.btn_reverse)
         btn_layout.addWidget(self.btn_remove)
         left_layout.addLayout(btn_layout)
         
@@ -160,7 +176,7 @@ class ModernRenamer(QMainWindow):
         
         self.preview_area = QTextEdit()
         self.preview_area.setReadOnly(True)
-        self.preview_area.setPlaceholderText("Değişiklikleri görmek için 'Önizle' butonuna basın...")
+        self.preview_area.setPlaceholderText("Yapılan Değişiklikler Otomatik Olarak Önizleme Ekranında Görünecektir.")
         left_layout.addWidget(self.preview_area)
         
         # --- RIGHT PANEL: Settings with ScrollArea ---
@@ -172,7 +188,7 @@ class ModernRenamer(QMainWindow):
         scroll.setWidgetResizable(True)
         scroll_content = QWidget()
         right_layout = QVBoxLayout(scroll_content)
-        right_layout.setSpacing(15) 
+        right_layout.setSpacing(8) 
         
         # Settings Title & About Button
         header_layout = QHBoxLayout()
@@ -189,7 +205,33 @@ class ModernRenamer(QMainWindow):
         header_layout.addWidget(self.btn_about)
         right_layout.addLayout(header_layout)
 
-        # 1. Değiştir / Yerine Koy
+        # 1. Sıfırdan Adlandır
+        self.group_scratch = QGroupBox("Sıfırdan Adlandır")
+        self.group_scratch.setCheckable(True)
+        self.group_scratch.setChecked(False)
+        scratch_layout = QVBoxLayout()
+        self.txt_scratch_name = QLineEdit()
+        self.txt_scratch_name.setPlaceholderText("Yeni dosya adı...")
+        scratch_layout.addWidget(QLabel("Yeni İsim:"))
+        scratch_layout.addWidget(self.txt_scratch_name)
+        self.group_scratch.setLayout(scratch_layout)
+        right_layout.addWidget(self.group_scratch)
+
+        # 2. Sıralı Numaralandır
+        self.group_sequence = QGroupBox("Sıralı Numaralandır")
+        self.group_sequence.setCheckable(True)
+        self.group_sequence.setChecked(False)
+        seq_layout = QHBoxLayout()
+        self.txt_seq_start = QLineEdit("1")
+        self.txt_seq_start.setFixedWidth(50)
+        self.txt_seq_start.setFixedHeight(25)
+        seq_layout.addWidget(QLabel("Başlangıç:"))
+        seq_layout.addWidget(self.txt_seq_start)
+        seq_layout.addStretch()
+        self.group_sequence.setLayout(seq_layout)
+        right_layout.addWidget(self.group_sequence)
+
+        # 3. Değiştir / Yerine Koy
         self.group_replace = QGroupBox("Değiştir / Yerine Koy")
         self.group_replace.setCheckable(True)
         self.group_replace.setChecked(False)
@@ -205,29 +247,31 @@ class ModernRenamer(QMainWindow):
         self.group_replace.setLayout(replace_layout)
         right_layout.addWidget(self.group_replace)
 
-        # 2. Karakter Sil
+        # 4. Karakter Sil
         self.group_delete = QGroupBox("Karakter / Kelime Sil")
         self.group_delete.setCheckable(True)
         self.group_delete.setChecked(False)
         delete_layout = QVBoxLayout()
         self.txt_delete = QLineEdit()
         self.txt_delete.setPlaceholderText("Silinecek metin...")
+        self.chk_each_char = QCheckBox("Yazılan karakterleri tek tek sil")
         delete_layout.addWidget(self.txt_delete)
+        delete_layout.addWidget(self.chk_each_char)
         self.group_delete.setLayout(delete_layout)
         right_layout.addWidget(self.group_delete)
 
-        # 3. Harf Durumu (Radio)
+        # 5. Harf Durumu (Radio)
         harf_group = QGroupBox("Metin Manipülasyonu")
         harf_layout = QVBoxLayout()
-        harf_layout.setSpacing(2) # Radio butonlar arası mesafe daraltıldı
-        harf_layout.setContentsMargins(15, 25, 15, 10) 
+        harf_layout.setSpacing(0) # Radio butonlar arası mesafe minimuma indirildi
+        harf_layout.setContentsMargins(15, 15, 15, 5) 
         self.radio_none = QRadioButton("Değiştirme (Varsayılan)")
         self.radio_none.setChecked(True)
         self.radio_lower = QRadioButton("küçük harf")
         self.radio_upper = QRadioButton("BÜYÜK HARF")
         self.radio_title = QRadioButton("Kelimelerin Baş Harfleri Büyük")
         self.radio_swap = QRadioButton("hARFLERİ tERS çEVİR")
-        self.radio_reverse = QRadioButton("İsmi Ters Çevir")
+        self.radio_reverse = QRadioButton("İsmi Ters Çevir (Örn: 123.jpg -> 321.jpg)")
         
         harf_layout.addWidget(self.radio_none)
         harf_layout.addWidget(self.radio_lower)
@@ -238,11 +282,11 @@ class ModernRenamer(QMainWindow):
         harf_group.setLayout(harf_layout)
         right_layout.addWidget(harf_group)
 
-        # 4. Ön Ek / Son Ek
+        # 6. Ön Ek / Son Ek
         ek_group = QGroupBox("Eklentiler")
         ek_layout = QVBoxLayout()
-        ek_layout.setSpacing(10)
-        ek_layout.setContentsMargins(15, 30, 15, 15)
+        ek_layout.setSpacing(5)
+        ek_layout.setContentsMargins(15, 20, 15, 10)
         self.chk_prefix = QCheckBox("Ön Ek Ekle:")
         self.txt_prefix = QLineEdit()
         self.txt_prefix.setPlaceholderText("Ör: Proje_")
@@ -259,19 +303,6 @@ class ModernRenamer(QMainWindow):
         ek_group.setLayout(ek_layout)
         right_layout.addWidget(ek_group)
 
-        # 5. Sıralı Artır
-        self.group_sequence = QGroupBox("Sıralı Adlandırma")
-        self.group_sequence.setCheckable(True)
-        self.group_sequence.setChecked(False)
-        seq_layout = QHBoxLayout()
-        self.txt_seq_start = QLineEdit("1")
-        self.txt_seq_start.setFixedWidth(60)
-        seq_layout.addWidget(QLabel("Başlangıç:"))
-        seq_layout.addWidget(self.txt_seq_start)
-        seq_layout.addStretch()
-        self.group_sequence.setLayout(seq_layout)
-        right_layout.addWidget(self.group_sequence)
-
         right_layout.addStretch()
         
         scroll.setWidget(scroll_content)
@@ -280,12 +311,12 @@ class ModernRenamer(QMainWindow):
         # Action Buttons (Fixed at bottom)
         action_layout = QHBoxLayout()
         self.btn_preview = QPushButton("ÖNİZLE")
-        self.btn_preview.setFixedHeight(60)
+        self.btn_preview.setFixedHeight(45)
         self.btn_preview.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_preview.setVisible(False) # Butonu sakla, artık otomatik önizleme var
         self.btn_apply = QPushButton("UYGULA")
         self.btn_apply.setObjectName("primaryBtn")
-        self.btn_apply.setFixedHeight(60)
+        self.btn_apply.setFixedHeight(45)
         self.btn_apply.setCursor(Qt.CursorShape.PointingHandCursor)
         
         action_layout.addWidget(self.btn_preview)
@@ -304,6 +335,9 @@ class ModernRenamer(QMainWindow):
         # Butonlar
         self.btn_add.clicked.connect(self.add_files)
         self.btn_remove.clicked.connect(self.remove_files)
+        self.btn_up.clicked.connect(self.move_up)
+        self.btn_down.clicked.connect(self.move_down)
+        self.btn_reverse.clicked.connect(self.reverse_list)
         self.btn_preview.clicked.connect(self.on_preview)
         self.btn_apply.clicked.connect(self.on_apply)
         self.btn_about.clicked.connect(self.show_about)
@@ -313,6 +347,7 @@ class ModernRenamer(QMainWindow):
         self.txt_find.textChanged.connect(self.on_preview)
         self.txt_replace.textChanged.connect(self.on_preview)
         self.txt_delete.textChanged.connect(self.on_preview)
+        self.chk_each_char.toggled.connect(self.on_preview)
         self.txt_prefix.textChanged.connect(self.on_preview)
         self.txt_suffix.textChanged.connect(self.on_preview)
         self.txt_seq_start.textChanged.connect(self.on_preview)
@@ -320,7 +355,11 @@ class ModernRenamer(QMainWindow):
         # 2. Checkbox ve GroupBox Değişimleri
         self.group_replace.toggled.connect(self.on_preview)
         self.group_delete.toggled.connect(self.on_preview)
+        self.group_sequence.toggled.connect(self.ensure_sequence_if_scratch)
         self.group_sequence.toggled.connect(self.on_preview)
+        self.group_scratch.toggled.connect(self.handle_scratch_dependency)
+        self.group_scratch.toggled.connect(self.on_preview)
+        self.txt_scratch_name.textChanged.connect(self.on_preview)
         
         self.chk_prefix.toggled.connect(self.txt_prefix.setEnabled)
         self.chk_prefix.toggled.connect(self.on_preview)
@@ -374,10 +413,58 @@ class ModernRenamer(QMainWindow):
             self.file_list.takeItem(self.file_list.row(item))
         self.on_preview() # Dosyalar silinince önizle
 
+    def move_up(self):
+        selected_rows = [self.file_list.row(item) for item in self.file_list.selectedItems()]
+        selected_rows.sort()
+        
+        for row in selected_rows:
+            if row > 0:
+                item = self.file_list.takeItem(row)
+                self.file_list.insertItem(row - 1, item)
+                item.setSelected(True)
+        self.on_preview()
+
+    def move_down(self):
+        selected_rows = [self.file_list.row(item) for item in self.file_list.selectedItems()]
+        selected_rows.sort(reverse=True)
+        
+        for row in selected_rows:
+            if row < self.file_list.count() - 1:
+                item = self.file_list.takeItem(row)
+                self.file_list.insertItem(row + 1, item)
+                item.setSelected(True)
+        self.on_preview()
+
+    def reverse_list(self):
+        items = []
+        for i in range(self.file_list.count()):
+            items.append(self.file_list.takeItem(0))
+        
+        for item in reversed(items):
+            self.file_list.addItem(item)
+        self.on_preview()
+
+    def handle_scratch_dependency(self, checked):
+        if checked:
+            self.group_sequence.setChecked(True)
+        self.on_preview()
+
+    def ensure_sequence_if_scratch(self, checked):
+        if not checked and self.group_scratch.isChecked():
+            self.group_sequence.setChecked(True)
+        self.on_preview()
+
     def isim_donustur(self, eski_tam_yol, sira=0):
         dizin, eski_isim = os.path.split(eski_tam_yol)
         isim, uzanti = os.path.splitext(eski_isim)
-        yeni_isim = isim
+        
+        # 0. Sıfırdan Adlandır
+        if self.group_scratch.isChecked():
+            yeni_isim = self.txt_scratch_name.text()
+            if not yeni_isim:
+                yeni_isim = "dosya" # Varsayılan isim
+        else:
+            yeni_isim = isim
 
         # 1. Değiştir / Yerine Koy
         if self.group_replace.isChecked():
@@ -390,7 +477,13 @@ class ModernRenamer(QMainWindow):
         if self.group_delete.isChecked():
             del_str = self.txt_delete.text()
             if del_str:
-                yeni_isim = yeni_isim.replace(del_str, "")
+                if self.chk_each_char.isChecked():
+                    # Karakterleri tek tek sil
+                    for char in del_str:
+                        yeni_isim = yeni_isim.replace(char, "")
+                else:
+                    # Metni blok olarak sil
+                    yeni_isim = yeni_isim.replace(del_str, "")
 
         # 3. Harf Durumu
         if self.radio_lower.isChecked():
@@ -412,7 +505,7 @@ class ModernRenamer(QMainWindow):
         if self.chk_suffix.isChecked():
             yeni_isim = yeni_isim + self.txt_suffix.text()
 
-        # 6. Sıralı Artır
+        # 6. Sıralı Numaralandır
         if self.group_sequence.isChecked():
             try:
                 start_val = int(self.txt_seq_start.text())
@@ -449,27 +542,31 @@ class ModernRenamer(QMainWindow):
                 
                 try:
                     os.rename(old_path, new_path)
+                    self.file_list.item(i).setText(new_path) # Listeyi güncelle
                     success += 1
                 except Exception as e:
                     print(f"Hata: {e}")
                     errors += 1
                     QMessageBox.critical(self, "Hata", f"Yeniden adlandırma sırasında hata oluştu:\n{str(e)}")
             
-            self.file_list.clear()
-            self.preview_area.clear()
+            self.on_preview() # Yeni yollara göre önizlemeyi yenile
             QMessageBox.information(self, "Bitti", f"İşlem tamamlandı.\nBaşarılı: {success}\nHata: {errors}")
 
     def show_about(self):
         about_text = """
-        <h3>Yeniden Adlandır v2.0</h3>
+        <h3>Yeniden Adlandırıcı [ Renamer ] v2.2</h3>
         <p>Dosyalarınızı hızlı ve güvenli bir şekilde toplu olarak yeniden adlandırabileceğiniz modern bir araçtır.</p>
         <p><b>Temel Özellikler:</b></p>
         <ul>
+            <li>Sıfırdan Adlandırma</li>
+            <li>Sıralı Numaralandırma</li>
             <li>Bul ve Değiştir</li>
             <li>Karakter/Kelime Silme</li>
             <li>Metin Manipülasyonu (küçük / BÜYÜK harf dönüşümü, ...vb</li>
             <li>Ön Ek ve Son Ek Ekleme</li>
-            <li>Sıralı Numaralandırma</li>
+			<li>Dosya Eklemede Sürükle-Bırak Desteği</li>
+			<li>Eklenen Dosyaları CTRL ile tek tek ya da SHIFT ile bir aralıkta Seçme</li>
+            <li>Dosya Sıralamasını Değiştirme (Yukarı/Aşağı/Ters)</li>
             <li>Anlık Dinamik Önizleme</li>
         </ul>
         <p><b>Geliştirici Bilgileri:</b></p>
