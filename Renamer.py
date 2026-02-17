@@ -572,7 +572,8 @@ class ModernRenamer(QMainWindow):
         <p><b>Geliştirici Bilgileri:</b></p>
         <ul>
         <li>Geliştirici: Mustafa Halil GÖRENTAŞ</li>
-        <li>Kaynak Kod: https://github.com/mhalil/YenidenAdlandir_Renamer</li>
+		<li>E-Posta: <a href='mailto:halil.mustafa@gmail.com' style='color: #2563eb; text-decoration: none;'>halil.mustafa@gmail.com</a></li>
+        <li>Kaynak Kod: <a href=https://github.com/mhalil/YenidenAdlandir_Renamer>github.com/mhalil/YenidenAdlandir_Renamer</a></li>
         </ul>
         <p><b>Teknik Bilgiler:</b></p>
         <ul>
@@ -580,6 +581,7 @@ class ModernRenamer(QMainWindow):
             <li>Metodoloji: Vibe Coding</li>
             <li>Teknoloji: Python 3.12.4, PyQt6 (Riverbank Computing) ve Qt Framework (The Qt Company).</li>
         </ul>
+        GPL Lisansı Altında Dağıtılmaktadır. | 2026
         </p>
         """
         msg = QMessageBox(self)
