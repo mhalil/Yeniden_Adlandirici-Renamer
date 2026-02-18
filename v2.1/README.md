@@ -30,8 +30,6 @@ Yaptığınız değişiklikleri, Önizleme ekranında eşzamanlı olarak görebi
 
 **Geliştirici**: Mustafa Halil GÖRENTAŞ
 
-**E-Posta**: halil.mustafa@gmail.com
-
 **Kaynak Kod**: https://github.com/mhalil/YenidenAdlandir_Renamer
 
 ## Teknik Bilgiler:

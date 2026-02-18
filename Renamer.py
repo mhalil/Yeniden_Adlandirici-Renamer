@@ -572,7 +572,6 @@ class ModernRenamer(QMainWindow):
         <p><b>Geliştirici Bilgileri:</b></p>
         <ul>
         <li>Geliştirici: Mustafa Halil GÖRENTAŞ</li>
-		<li>E-Posta: <a href='mailto:halil.mustafa@gmail.com' style='color: #2563eb; text-decoration: none;'>halil.mustafa@gmail.com</a></li>
         <li>Kaynak Kod: <a href=https://github.com/mhalil/YenidenAdlandir_Renamer>github.com/mhalil/YenidenAdlandir_Renamer</a></li>
         </ul>
         <p><b>Teknik Bilgiler:</b></p>
