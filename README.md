@@ -1,4 +1,4 @@
-# Yeniden Adlandırıcı  ( Renamer )
+# Yeniden Adlandırıcı  ( Renamer ) v2.2
 
 Dosya isimlerini, belirlediğiniz parametrelere göre yeniden adlandıran uygulama.
 
@@ -50,7 +50,9 @@ Belirlediğiniz kriterlere göre oluşacak dosya adlarını, Önizleme ekranınd
 **Metodoloji**: Vibe Coding
 **Teknoloji**: [Python](https://www.python.org/) 3.12.4, [PyQt6]((https://www.riverbankcomputing.com/static/Docs/PyQt6/)) [Riverbank Computing](https://riverbankcomputing.com/software/pyqt) ve [Qt Framework (The Qt Company)](https://www.qt.io/development/qt-framework).
 
-## Uygulama Arabirimi;
+## Uygulama Ekran Görüntüleri;
+
+### Linux:
 
 ![yeniden_adlandir_1](img/yeniden_adlandir_1.png)
 ![yeniden_adlandir_2](img/yeniden_adlandir_2.png)
